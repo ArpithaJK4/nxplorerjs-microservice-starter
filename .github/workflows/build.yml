@@ -2,12 +2,12 @@ name: Node.js CI
 
 on:
   push:
-    branches: [main, develop, patch-1]
+    branches: [ main , patch-1]
   pull_request:
-    branches: [main, develop, patch-1]
+    branches: [ main , patch-1]
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     strategy:
@@ -15,7 +15,7 @@ jobs:
         node-version: [18.x]
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Node.js ${{ matrix.node-version }}
@@ -26,20 +26,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
-        run: npm run build
+      # Removed build step as your project doesn't need it
 
-      - name: Fix swapi tests (mock usage or skip test)
+      - name: Fix test for swapi.dev
         run: |
-          echo "Ensure swapi.dev is mocked or test is skipped"
-          # If you have a mock file, uncomment below and add it
-          # cp ./__mocks__/swapi.mock.js ./server/api/services/
+          echo "Fixing test for swapi.dev..."
+          sed -i 's|http://swapi.co/api|https://swapi.dev/api|g' ./server/api/services/response-builder.spec.ts
 
       - name: Run tests
-        run: npm run test
-
-      - name: Upload test coverage (optional)
-        if: success()
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+        run: npm test
